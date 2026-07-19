@@ -1,0 +1,70 @@
+Yêu cầu Assignment (Bài tập lớn cuối môn)
+
+Mỗi bạn chọn chủ đề khác nhau (không trùng nhau) cho Assignment - chọn chủ đề nào thì comment bên dưới để các bạn khác thấy (hạn comment chọn chủ đề là từ hôm nay ) 
+- Quy tắc comment là Tên đề tài - thuộc Chủ đề 
+
+ASSIGNMENT: XÂY DỰNG ỨNG DỤNG DI ĐỘNG ĐA NỀN TẢNG (FLUTTER)
+
+1. TỔNG QUAN & CHỦ ĐỀ
+Sinh viên được tự do lựa chọn chủ đề cho ứng dụng (Ví dụ: E-commerce, Quản lý tài chính cá nhân, Quản lý công việc / học tập, Đặt lịch khám bệnh, App học tập, Tin tức, Game đơn giản, hoặc bất kỳ ý tưởng thực tế nào khác...).
+Tiêu chí: 
+Ứng dụng phải giải quyết một nhu cầu thực tế.
+Mỗi sinh viên có một ý tưởng riêng biệt để tránh trùng lặp mã nguồn.
+
+2. YÊU CẦU KỸ THUẬT & THANG ĐIỂM CHI TIẾT
+A. Phần Nền tảng bắt buộc (80 điểm) 
+Đây là phần đánh giá việc nắm vững kiến thức cốt lõi trong giáo trình.
+UI/UX & Layout (20đ):
+Sử dụng linh hoạt các Layout Widgets
+Cấu trúc màn hình chuyên nghiệp
+Hỗ trợ Responsive (Xử lý được chế độ Xoay ngang/Dọc hoặc các kích thước màn hình khác nhau).
+Thiết kế Themes: Hỗ trợ tối thiểu 2 chế độ (Light/Dark mode).
+Xử lý Dữ liệu & Form (20đ):
+Ít nhất một chức năng nhập liệu có sử dụng Form và Validation (Check lỗi bỏ trống, định dạng email, độ dài mật khẩu,...).
+Điều hướng & Luồng ứng dụng, Quản lý Trạng thái & bất đồng bộ (20đ):
+Triển khai Navigation với ít nhất 3 màn hình.
+Có chia sẻ/truyền dữ liệu giữa các màn hình mà không cần truyền tham số thủ công.
+Có xử lý dữ liệu bất đồng bộ.
+Lưu trữ & Kết nối (20đ):
+Tích hợp thành công REST API (http package) hoặc Local Database (Sqflite) để dữ liệu không bị mất khi khởi động lại app.
+Sử dụng và hiển thị dữ liệu này để thao tác.
+
+B. Phần Nghiên cứu nâng cao (20 điểm)
+Đây là phần đánh giá kỹ thuật nâng cao và khả năng tự nghiên cứu của sinh viên. Các kỹ thuật gợi ý như sau (chỉ cần vận dụng được 1 trong các kỹ thuật sau).
+1. Trải nghiệm người dùng chuyên nghiệp (UX/UI High-end)
+Ví dụ: Tập trung vào việc biến một ứng dụng thành một sản phẩm mượt mà, chuyên nghiệp.
+Sliver Widgets & Custom Scroll: Thay vì dùng ListView cơ bản, hãy sử dụng CustomScrollView với SliverAppBar (hiệu ứng co giãn header), SliverGrid. Điều này giúp app có giao diện giống các ứng dụng lớn như Facebook, Spotify hay Shopee.
+Advanced Animations: Tích hợp các tệp Lottie (JSON) cho màn hình chào (Splash screen), màn hình chờ (Loading) hoặc thông báo thành công để tăng tính sinh động.
+Xử lý hình ảnh thông minh: Sử dụng thư viện cached_network_image để lưu tạm hình ảnh từ internet, giúp app load nhanh hơn ở lần sau và xử lý hiệu ứng "Placeholder" khi ảnh đang tải.
+…
+
+2. Tích hợp Hệ thống & Cloud (Real-time & Services)
+Ví dụ: Khả năng kết nối và vận hành ứng dụng trong môi trường internet thực tế.
+Firebase Ecosystem
+- Authentication: Cho phép người dùng đăng nhập qua Email/Password hoặc Google.
+- Cloud Firestore/Realtime Database: Lưu trữ và cập nhật dữ liệu ngay lập tức (ví dụ: gửi tin nhắn, cập nhật trạng thái đơn hàng).
+- Firebase Storage (upload ảnh)
+- Push Notification (FCM)
+- …
+Location-based Services
+- Tích hợp Google Maps API để hiển thị vị trí hoặc sử dụng geolocator để lấy tọa độ hiện tại của người dùng.
+- …
+External Plugins thực dụng: 
+- Chụp ảnh từ Camera hoặc chọn từ Gallery để làm ảnh đại diện.
+- Notification.
+- …
+
+3. HÌNH THỨC NỘP BÀI (DELIVERABLES)
+Để tài làm được công nhận, sinh viên cần nộp gồm:
+Source Code: Thư mục dự án hoàn chỉnh (nén lại, có thể loại bỏ thư mục build để giảm dung lượng). Mã nguồn cần sạch sẽ, đặt tên biến theo chuẩn, code rõ ràng, có comment cơ bản.
+Technical Report (File PDF):
+Mô tả ý tưởng và sơ đồ luồng ứng dụng (Workflow).
+Bảng liệt kê các chức năng đã hoàn thành.
+Mô hình CSDL (nếu có)
+Mô tả cơ bản kỹ thuật nâng cao đã tự nghiên cứu.
+Video hướng dẫn sử dụng: Quay màn hình thao tác trên thiết bị thật/giả lập. (Yêu cầu có thuyết minh hoặc chú thích rõ các tính năng đang trình bày).
+
+Lưu ý quan trọng:
+Ứng dụng không biên dịch được (Lỗi Build): -50% tổng số điểm.
+Phát hiện sao chép mã nguồn (Plagiarism): 0 điểm.
+Khuyến khích sử dụng Hot Reload và DevTools để tối ưu hiệu suất trước khi nộp bài.

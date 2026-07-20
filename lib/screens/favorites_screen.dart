@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../providers/auth_provider.dart';
+
 import '../providers/favorite_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/constants.dart';
@@ -93,7 +93,7 @@ class FavoritesScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 24),
                   ElevatedButton.icon(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pushNamedAndRemoveUntil(context, AppRoutes.main, (route) => false),
                     icon: const Icon(Icons.storefront, size: 18),
                     label: const Text('Khám phá sản phẩm'),
                     style: ElevatedButton.styleFrom(

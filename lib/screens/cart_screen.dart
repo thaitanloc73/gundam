@@ -77,7 +77,9 @@ class _CartScreenState extends State<CartScreen> {
         actions: [
           TextButton(
             onPressed: () {
-              // Action Xoá các item đã chọn
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Tính năng đang phát triển')),
+              );
             },
             child: const Text('Sửa', style: TextStyle(color: Colors.white)),
           )

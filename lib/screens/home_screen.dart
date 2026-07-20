@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import '../providers/gundam_provider.dart';
-import '../providers/theme_provider.dart';
-import '../providers/auth_provider.dart';
+
 import '../providers/cart_provider.dart';
 import '../widgets/gundam_card.dart';
 import '../widgets/loading_widget.dart';
@@ -19,11 +18,13 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
+  String _selectedCategory = 'Tất cả';
   
   @override
   void initState() {
     super.initState();
     Future.microtask(() {
+      if (!mounted) return;
       Provider.of<GundamProvider>(context, listen: false).fetchGundams();
     });
   }
@@ -233,24 +234,45 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         itemBuilder: (context, index) {
           final cat = categories[index];
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.darkBg : Colors.grey.shade100,
-                  shape: BoxShape.circle,
+          return GestureDetector(
+            onTap: () {
+              setState(() {
+                _selectedCategory = cat['name'] as String;
+              });
+            },
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _selectedCategory == cat['name']
+                        ? AppColors.gundamRed.withValues(alpha: isDark ? 0.2 : 0.1)
+                        : (isDark ? AppColors.darkBg : Colors.grey.shade100),
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: _selectedCategory == cat['name'] ? AppColors.gundamRed : Colors.transparent,
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Icon(
+                    cat['icon'] as IconData, 
+                    color: _selectedCategory == cat['name'] ? AppColors.gundamRed : (isDark ? Colors.white70 : Colors.grey.shade700), 
+                    size: 24
+                  ),
                 ),
-                child: Icon(cat['icon'] as IconData, color: AppColors.gundamRed, size: 24),
-              ),
-              const SizedBox(height: 6),
-              Text(
-                cat['name'] as String,
-                style: const TextStyle(fontSize: 12),
-                textAlign: TextAlign.center,
-              )
-            ],
+                const SizedBox(height: 6),
+                Text(
+                  cat['name'] as String,
+                  style: TextStyle(
+                    fontSize: 12,
+                    fontWeight: _selectedCategory == cat['name'] ? FontWeight.bold : FontWeight.normal,
+                    color: _selectedCategory == cat['name'] ? AppColors.gundamRed : null,
+                  ),
+                  textAlign: TextAlign.center,
+                )
+              ],
+            ),
           );
         },
       ),
@@ -280,9 +302,16 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 const Spacer(),
-                Text(
-                  'Xem tất cả >',
-                  style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                GestureDetector(
+                  onTap: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Tính năng đang phát triển')),
+                    );
+                  },
+                  child: Text(
+                    'Xem tất cả >',
+                    style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                  ),
                 ),
               ],
             ),
@@ -300,7 +329,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   scrollDirection: Axis.horizontal,
                   itemCount: products.length,
-                  separatorBuilder: (_, __) => const SizedBox(width: 12),
+                  separatorBuilder: (context, index) => const SizedBox(width: 12),
                   itemBuilder: (context, index) {
                     final product = products[index];
                     return SizedBox(
@@ -415,6 +444,13 @@ class _HomeScreenState extends State<HomeScreen> {
         var products = provider.gundams;
         if (_searchQuery.isNotEmpty) {
           products = products.where((g) => g.name.toLowerCase().contains(_searchQuery)).toList();
+        }
+        
+        if (_selectedCategory != 'Tất cả') {
+          products = products.where((g) => 
+            g.grade.toUpperCase() == _selectedCategory.toUpperCase() || 
+            g.name.toLowerCase().contains(_selectedCategory.toLowerCase())
+          ).toList();
         }
 
         return SliverPadding(

@@ -107,7 +107,7 @@ class ProfileScreen extends StatelessWidget {
               const SizedBox(height: 10),
               
               // Tiện ích
-              Container(
+              Material(
                 color: surfaceColor,
                 child: Column(
                   children: [
@@ -128,7 +128,7 @@ class ProfileScreen extends StatelessWidget {
                         trailing: Switch(
                           value: theme.isDarkMode,
                           onChanged: (val) => theme.toggleTheme(),
-                          activeColor: AppColors.gundamRed,
+                          activeTrackColor: AppColors.gundamRed,
                         ),
                       ),
                     ),
@@ -137,7 +137,11 @@ class ProfileScreen extends StatelessWidget {
                       leading: const Icon(Icons.settings_outlined, color: Colors.grey),
                       title: const Text('Cài đặt'),
                       trailing: const Icon(Icons.chevron_right),
-                      onTap: () {},
+                      onTap: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Tính năng đang phát triển')),
+                        );
+                      },
                     ),
                     if (authProvider.isLoggedIn) ...[
                       const Divider(height: 1, indent: 50),
@@ -168,15 +172,22 @@ class _OrderIcon extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(icon, size: 28, color: Colors.grey[700]),
-        const SizedBox(height: 5),
-        Text(
-          label,
-          style: TextStyle(fontSize: 12, color: Colors.grey[800]),
-        ),
-      ],
+    return GestureDetector(
+      onTap: () {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Tính năng đang phát triển')),
+        );
+      },
+      child: Column(
+        children: [
+          Icon(icon, size: 28, color: Colors.grey[700]),
+          const SizedBox(height: 5),
+          Text(
+            label,
+            style: TextStyle(fontSize: 12, color: Colors.grey[800]),
+          ),
+        ],
+      ),
     );
   }
 }

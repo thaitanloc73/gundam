@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:lottie/lottie.dart';
+
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/favorite_provider.dart';
@@ -61,6 +61,8 @@ class _SplashScreenState extends State<SplashScreen>
       await Provider.of<FavoriteProvider>(context, listen: false)
           .loadFavorites(auth.currentUser!.id!, context.read<GundamProvider>());
     }
+
+    if (!mounted) return;
 
     String route;
     if (isLoggedIn) {

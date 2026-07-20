@@ -6,7 +6,7 @@ import 'gundam_provider.dart';
 
 class FavoriteProvider extends ChangeNotifier {
   final Set<String> _favoriteIds = {};
-  List<Gundam> _favorites = [];
+  final List<Gundam> _favorites = [];
   String? _userId;
 
   Set<String> get favoriteIds => _favoriteIds;

@@ -137,7 +137,11 @@ class ProductDetailScreen extends StatelessWidget {
                   ),
                 ),
                 OutlinedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('Tính năng đang phát triển')),
+                    );
+                  },
                   child: const Text('Xem Shop', style: TextStyle(color: AppColors.gundamRed)),
                 ),
               ],
@@ -260,12 +264,19 @@ class ProductDetailScreen extends StatelessWidget {
         children: [
           Expanded(
             flex: 1,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.chat_outlined, color: Colors.grey.shade600, size: 20),
-                Text('Chat', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
-              ],
+            child: InkWell(
+              onTap: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Tính năng đang phát triển')),
+                );
+              },
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.chat_outlined, color: Colors.grey.shade600, size: 20),
+                  Text('Chat', style: TextStyle(fontSize: 10, color: Colors.grey.shade600)),
+                ],
+              ),
             ),
           ),
           const VerticalDivider(width: 1),

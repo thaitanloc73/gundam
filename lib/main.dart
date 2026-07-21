@@ -1,5 +1,7 @@
 
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
 import 'package:provider/provider.dart';
 import 'providers/theme_provider.dart';
 import 'providers/auth_provider.dart';
@@ -16,10 +18,14 @@ import 'screens/product_detail_screen.dart';
 import 'screens/cart_screen.dart';
 import 'screens/checkout_screen.dart';
 import 'screens/favorites_screen.dart';
+import 'screens/orders_screen.dart';
 import 'utils/constants.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
 
   final themeProvider = ThemeProvider();
   await themeProvider.loadTheme();
@@ -61,6 +67,7 @@ class MyApp extends StatelessWidget {
             AppRoutes.cart: (context) => const CartScreen(),
             AppRoutes.checkout: (context) => const CheckoutScreen(),
             AppRoutes.favorites: (context) => const FavoritesScreen(),
+            AppRoutes.orders: (context) => const OrdersScreen(),
           },
         );
       },

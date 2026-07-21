@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "966277330376",
+    "project_id": "g-project-81290",
+    "storage_bucket": "g-project-81290.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:966277330376:android:f5db7204d6b9d0bc01bcfd",
+        "android_client_info": {
+          "package_name": "com.example.gundam"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_flPBvCF43wUw1n1WDFG30ko7xxqncZM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:966277330376:android:14deed4a80ceb7eb01bcfd",
+        "android_client_info": {
+          "package_name": "com.example.gundam_store"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB_flPBvCF43wUw1n1WDFG30ko7xxqncZM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

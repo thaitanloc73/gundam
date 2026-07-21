@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/favorite_provider.dart';
 import '../providers/gundam_provider.dart';
+import '../providers/cart_provider.dart';
 import '../utils/constants.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -45,8 +46,11 @@ class _LoginScreenState extends State<LoginScreen> {
       ));
     } else {
       if (auth.currentUser != null) {
-        await Provider.of<FavoriteProvider>(context, listen: false)
-            .loadFavorites(auth.currentUser!.id!, context.read<GundamProvider>());
+        final userId = auth.currentUser!.id!;
+        await Future.wait([
+          Provider.of<FavoriteProvider>(context, listen: false).loadFavorites(userId, context.read<GundamProvider>()),
+          Provider.of<CartProvider>(context, listen: false).loadCart(userId),
+        ]);
       }
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(

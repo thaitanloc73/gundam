@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/favorite_provider.dart';
 import '../providers/gundam_provider.dart';
+import '../providers/cart_provider.dart';
 import '../utils/constants.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -58,8 +59,11 @@ class _SplashScreenState extends State<SplashScreen>
     if (!mounted) return;
 
     if (isLoggedIn && auth.currentUser != null) {
-      await Provider.of<FavoriteProvider>(context, listen: false)
-          .loadFavorites(auth.currentUser!.id!, context.read<GundamProvider>());
+      final userId = auth.currentUser!.id!;
+      await Future.wait([
+        Provider.of<FavoriteProvider>(context, listen: false).loadFavorites(userId, context.read<GundamProvider>()),
+        Provider.of<CartProvider>(context, listen: false).loadCart(userId),
+      ]);
     }
 
     if (!mounted) return;

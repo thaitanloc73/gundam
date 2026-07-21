@@ -207,39 +207,77 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
+  void _showCategoryInfo(BuildContext context, String catName, String description) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text(catName, style: const TextStyle(color: AppColors.gundamRed, fontWeight: FontWeight.bold)),
+        content: Text(description, style: const TextStyle(height: 1.5)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('Đã hiểu', style: TextStyle(color: AppColors.gundamRed, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildCategoryGrid(bool isDark, Color surfaceColor) {
     final categories = [
-      {'name': 'SD', 'icon': Icons.child_care},
-      {'name': 'HG', 'icon': Icons.star_border},
-      {'name': 'RG', 'icon': Icons.star_half},
-      {'name': 'MG', 'icon': Icons.star},
-      {'name': 'PG', 'icon': Icons.workspace_premium},
-      {'name': 'Tools', 'icon': Icons.build},
-      {'name': 'Decal', 'icon': Icons.texture},
-      {'name': 'Tất cả', 'icon': Icons.category},
+      {'name': 'SD', 'icon': Icons.child_care, 'desc': 'Super Deformed (SD): Dòng Gundam mini đầu to, chân tay ngắn, siêu dễ thương và rất dễ lắp ráp. Thích hợp cho người mới bắt đầu.'},
+      {'name': 'HG', 'icon': Icons.star_border, 'desc': 'High Grade (HG - Tỉ lệ 1/144): Dòng phổ biến nhất, giá cả phải chăng học sinh sinh viên, chi tiết khá tốt và cực kỳ đa dạng mẫu mã.'},
+      {'name': 'RG', 'icon': Icons.star_half, 'desc': 'Real Grade (RG - Tỉ lệ 1/144): Kích thước nhỏ gọn bằng HG nhưng chi tiết cực kỳ sắc sảo, có khung xương bên trong tinh xảo như các dòng cỡ lớn.'},
+      {'name': 'MG', 'icon': Icons.star, 'desc': 'Master Grade (MG - Tỉ lệ 1/100): Kích thước lớn hơn, có khung xương chi tiết bên trong, biên độ cử động siêu linh hoạt, vô cùng thích hợp để trưng bày.'},
+      {'name': 'PG', 'icon': Icons.workspace_premium, 'desc': 'Perfect Grade (PG - Tỉ lệ 1/60): Dòng đỉnh cao nhất, to nhất, xịn nhất và đắt nhất. Thường được tích hợp đèn LED và vô số chi tiết cơ khí siêu thực.'},
+      {'name': 'Tools', 'icon': Icons.build, 'desc': 'Dụng cụ hỗ trợ: Kềm cắt nhựa, giấy nhám, bút kẻ lằn chìm, nhíp gắp... những món đồ hành nghề không thể thiếu khi chơi Gundam.'},
+      {'name': 'Decal', 'icon': Icons.texture, 'desc': 'Nhãn dán trang trí: Các loại decal nước, decal dạ quang giúp mô hình của bạn trông ngầu, chi tiết và chân thực hơn.'},
+      {'name': 'Tất cả', 'icon': Icons.category, 'desc': 'Hiển thị toàn bộ các sản phẩm hiện có trong cửa hàng.'},
     ];
 
     return Container(
       color: surfaceColor,
       padding: const EdgeInsets.symmetric(vertical: 16),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        itemCount: categories.length,
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          mainAxisSpacing: 16,
-          crossAxisSpacing: 8,
-          childAspectRatio: 0.9,
-        ),
-        itemBuilder: (context, index) {
-          final cat = categories[index];
-          return GestureDetector(
-            onTap: () {
-              setState(() {
-                _selectedCategory = cat['name'] as String;
-              });
-            },
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                const Text('Danh mục', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                Row(
+                  children: [
+                    Icon(Icons.touch_app, size: 14, color: Colors.grey.shade500),
+                    const SizedBox(width: 4),
+                    Text('Nhấn giữ icon để xem chú thích', style: TextStyle(fontSize: 12, color: Colors.grey.shade500)),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 12),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            itemCount: categories.length,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 4,
+              mainAxisSpacing: 16,
+              crossAxisSpacing: 8,
+              childAspectRatio: 0.9,
+            ),
+            itemBuilder: (context, index) {
+              final cat = categories[index];
+              return GestureDetector(
+                onTap: () {
+                  setState(() {
+                    _selectedCategory = cat['name'] as String;
+                  });
+                },
+                onLongPress: () => _showCategoryInfo(context, cat['name'] as String, cat['desc'] as String),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -275,6 +313,8 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           );
         },
+      ),
+        ],
       ),
     );
   }

@@ -1,6 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/gundam.dart';
 import 'gundam_provider.dart';
 
@@ -8,6 +7,7 @@ class FavoriteProvider extends ChangeNotifier {
   final Set<String> _favoriteIds = {};
   final List<Gundam> _favorites = [];
   String? _userId;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Set<String> get favoriteIds => _favoriteIds;
   List<Gundam> get favorites => _favorites;
@@ -17,35 +17,43 @@ class FavoriteProvider extends ChangeNotifier {
   Future<void> loadFavorites(String userId, GundamProvider gundamProvider) async {
     _userId = userId;
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final favString = prefs.getString('fav_$_userId');
+      // Lấy document của user từ Firebase
+      final doc = await _firestore.collection('users').doc(_userId).get();
       
       _favoriteIds.clear();
       _favorites.clear();
 
-      if (favString != null) {
-        final List<dynamic> favList = json.decode(favString);
-        for (var id in favList) {
-          _favoriteIds.add(id.toString());
-          final gundam = await gundamProvider.getGundamById(id.toString());
-          if (gundam != null) {
-            _favorites.add(gundam);
+      if (doc.exists) {
+        final data = doc.data()!;
+        // Kiểm tra xem đã có danh sách yêu thích chưa
+        if (data.containsKey('favorites')) {
+          final List<dynamic> favList = data['favorites'];
+          for (var id in favList) {
+            _favoriteIds.add(id.toString());
+            // Từ ID yêu thích, đối chiếu qua GundamProvider để lấy ra sản phẩm thật
+            final gundam = await gundamProvider.getGundamById(id.toString());
+            if (gundam != null) {
+              _favorites.add(gundam);
+            }
           }
         }
       }
     } catch (e) {
-      // Ignore
+      print("Lỗi tải mục yêu thích: $e");
     }
     notifyListeners();
   }
 
+  // Cập nhật lại mảng yêu thích lên Firebase mỗi khi có biến động (thêm/bớt)
   Future<void> _syncFavorites() async {
     if (_userId == null) return;
     try {
-      final prefs = await SharedPreferences.getInstance();
-      await prefs.setString('fav_$_userId', json.encode(_favoriteIds.toList()));
+      // Dùng SetOptions(merge: true) để không ghi đè mất giỏ hàng (cart) hay các trường khác
+      await _firestore.collection('users').doc(_userId).set({
+        'favorites': _favoriteIds.toList(),
+      }, SetOptions(merge: true));
     } catch (e) {
-      // Ignore
+      print("Lỗi đồng bộ mục yêu thích: $e");
     }
   }
 

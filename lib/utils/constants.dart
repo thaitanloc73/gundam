@@ -12,6 +12,7 @@ class AppRoutes {
   static const String adminProducts = '/admin/products';
   static const String adminOrders = '/admin/orders';
   static const String favorites = '/favorites';
+  static const String orders = '/orders';
 }
 
 class AppColors {

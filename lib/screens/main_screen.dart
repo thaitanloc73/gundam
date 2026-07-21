@@ -27,36 +27,47 @@ class _MainScreenState extends State<MainScreen> {
           if (orientation == Orientation.landscape) {
             return Row(
               children: [
-                NavigationRail(
-                  selectedIndex: _currentIndex,
-                  onDestinationSelected: (int index) {
-                    setState(() {
-                      _currentIndex = index;
-                    });
-                  },
-                  labelType: NavigationRailLabelType.all,
-                  destinations: const [
-                    NavigationRailDestination(
-                      icon: Icon(Icons.home_outlined),
-                      selectedIcon: Icon(Icons.home),
-                      label: Text('Trang chủ'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.category_outlined),
-                      selectedIcon: Icon(Icons.category),
-                      label: Text('Danh mục'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.notifications_outlined),
-                      selectedIcon: Icon(Icons.notifications),
-                      label: Text('Thông báo'),
-                    ),
-                    NavigationRailDestination(
-                      icon: Icon(Icons.person_outline),
-                      selectedIcon: Icon(Icons.person),
-                      label: Text('Cá nhân'),
-                    ),
-                  ],
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    return SingleChildScrollView(
+                      child: ConstrainedBox(
+                        constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                        child: IntrinsicHeight(
+                          child: NavigationRail(
+                            selectedIndex: _currentIndex,
+                            onDestinationSelected: (int index) {
+                              setState(() {
+                                _currentIndex = index;
+                              });
+                            },
+                            labelType: NavigationRailLabelType.all,
+                            destinations: const [
+                              NavigationRailDestination(
+                                icon: Icon(Icons.home_outlined),
+                                selectedIcon: Icon(Icons.home),
+                                label: Text('Trang chủ'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.category_outlined),
+                                selectedIcon: Icon(Icons.category),
+                                label: Text('Danh mục'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.notifications_outlined),
+                                selectedIcon: Icon(Icons.notifications),
+                                label: Text('Thông báo'),
+                              ),
+                              NavigationRailDestination(
+                                icon: Icon(Icons.person_outline),
+                                selectedIcon: Icon(Icons.person),
+                                label: Text('Cá nhân'),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                 ),
                 const VerticalDivider(thickness: 1, width: 1),
                 Expanded(

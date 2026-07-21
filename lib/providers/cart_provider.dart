@@ -1,6 +1,5 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class CartItem {
   final String gundamId;
@@ -37,9 +36,10 @@ class CartItem {
 class CartProvider extends ChangeNotifier {
   Map<String, CartItem> _items = {};
   String? _userId;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Map<String, CartItem> get items => _items;
-  int get totalItems => _items.values.fold(0, (sum, item) => sum + item.quantity);
+  int get totalItems => _items.values.fold(0, (acc, item) => acc + item.quantity);
 
   double get totalAmount {
     var total = 0.0;
@@ -52,29 +52,41 @@ class CartProvider extends ChangeNotifier {
   Future<void> loadCart(String userId) async {
     _userId = userId;
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final cartString = prefs.getString('cart_$_userId');
+      // Gọi lên Firebase, vào bảng users, lấy tài liệu của user hiện tại
+      final doc = await _firestore.collection('users').doc(_userId).get();
       _items.clear();
-      if (cartString != null) {
-        final Map<String, dynamic> cartMap = json.decode(cartString);
-        cartMap.forEach((key, value) {
-          _items[key] = CartItem.fromMap(value);
-        });
+      
+      if (doc.exists) {
+        final data = doc.data()!;
+        // Nếu user này đã có trường 'cart' thì lấy dữ liệu về
+        if (data.containsKey('cart')) {
+          final Map<String, dynamic> cartMap = Map<String, dynamic>.from(data['cart']);
+          cartMap.forEach((key, value) {
+            _items[key] = CartItem.fromMap(Map<String, dynamic>.from(value));
+          });
+        }
       }
-      notifyListeners();
+      notifyListeners(); // Báo cho giao diện cập nhật
     } catch (e) {
+      print("Lỗi tải giỏ hàng: $e");
       _items = {};
+      notifyListeners();
     }
   }
 
+  // Hàm đồng bộ giỏ hàng lên Firebase mỗi khi có thay đổi
   Future<void> _syncCart() async {
     if (_userId == null) return;
     try {
-      final prefs = await SharedPreferences.getInstance();
+      // Chuyển danh sách sản phẩm thành dạng JSON/Map để lưu
       final cartMap = _items.map((key, value) => MapEntry(key, value.toMap()));
-      await prefs.setString('cart_$_userId', json.encode(cartMap));
+      
+      // Dùng merge: true để chỉ cập nhật trường 'cart' mà không làm mất các trường khác (như name, email, favorites...)
+      await _firestore.collection('users').doc(_userId).set({
+        'cart': cartMap
+      }, SetOptions(merge: true));
     } catch (e) {
-      // Ignored
+      print("Lỗi đồng bộ giỏ hàng: $e");
     }
   }
 
@@ -112,7 +124,7 @@ class CartProvider extends ChangeNotifier {
 
   Future<void> clear() async {
     _items.clear();
-    _syncCart();
+    await _syncCart();
     notifyListeners();
   }
 }

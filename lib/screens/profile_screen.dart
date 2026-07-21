@@ -4,6 +4,7 @@ import '../providers/auth_provider.dart';
 import '../providers/theme_provider.dart';
 import '../utils/constants.dart';
 
+
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
 
@@ -83,9 +84,14 @@ class ProfileScreen extends StatelessWidget {
                               'Đơn hàng của tôi',
                               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
-                            Text(
-                              'Xem lịch sử',
-                              style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, AppRoutes.orders);
+                              },
+                              child: Text(
+                                'Xem lịch sử',
+                                style: TextStyle(fontSize: 14, color: Colors.blue.shade600, fontWeight: FontWeight.w600),
+                              ),
                             ),
                           ],
                         ),
@@ -118,6 +124,7 @@ class ProfileScreen extends StatelessWidget {
                       onTap: () => Navigator.pushNamed(context, AppRoutes.favorites),
                     ),
                     const Divider(height: 1, indent: 50),
+
                     Consumer<ThemeProvider>(
                       builder: (context, theme, _) => ListTile(
                         leading: Icon(

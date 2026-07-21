@@ -182,13 +182,16 @@ class ProductDetailScreen extends StatelessWidget {
           flex: 1,
           child: Stack(
             children: [
-              CachedNetworkImage(
-                imageUrl: gundam.imageUrl,
-                fit: BoxFit.cover,
-                height: double.infinity,
+              Container(
+                color: Colors.black, // Nền đen chống viền trắng khi dùng contain
                 width: double.infinity,
-                placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
-                errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+                height: double.infinity,
+                child: CachedNetworkImage(
+                  imageUrl: gundam.imageUrl,
+                  fit: BoxFit.contain, // Đổi sang contain để không bị bể ảnh/cắt ảnh
+                  placeholder: (context, url) => const Center(child: CircularProgressIndicator()),
+                  errorWidget: (context, url, error) => const Center(child: Icon(Icons.error)),
+                ),
               ),
               Positioned(
                 top: 30,
@@ -209,11 +212,12 @@ class ProductDetailScreen extends StatelessWidget {
         Expanded(
           flex: 1,
           child: Container(
-            color: surfaceColor,
+            color: isDark ? AppColors.darkBg : AppColors.lightBg,
             child: CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
-                  child: Padding(
+                  child: Container(
+                    color: surfaceColor,
                     padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,10 +235,68 @@ class ProductDetailScreen extends StatelessWidget {
                           gundam.name,
                           style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            const Icon(Icons.star, color: Colors.orange, size: 16),
+                            const Text(' 4.9', style: TextStyle(fontWeight: FontWeight.bold)),
+                            const SizedBox(width: 10),
+                            const Text('|'),
+                            const SizedBox(width: 10),
+                            Text('Đã bán ${100 - gundam.stock}', style: const TextStyle(color: Colors.grey)),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: surfaceColor,
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        const CircleAvatar(
+                          backgroundImage: AssetImage('assets/images/logo.png'),
+                        ),
+                        const SizedBox(width: 12),
+                        const Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Gundam Official', style: TextStyle(fontWeight: FontWeight.bold)),
+                              Text('Online 5 phút trước', style: TextStyle(color: Colors.grey, fontSize: 12)),
+                            ],
+                          ),
+                        ),
+                        OutlinedButton(
+                          onPressed: () {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Tính năng đang phát triển')),
+                            );
+                          },
+                          child: const Text('Xem Shop', style: TextStyle(color: AppColors.gundamRed)),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SliverToBoxAdapter(child: SizedBox(height: 8)),
+                SliverToBoxAdapter(
+                  child: Container(
+                    color: surfaceColor,
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
                         const Text('Mô tả sản phẩm', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                         const SizedBox(height: 12),
                         const Text('Sản phẩm chất lượng cao từ Bandai, độ chi tiết hoàn hảo. Khớp linh hoạt có thể tạo nhiều tư thế đẹp mắt.', style: TextStyle(height: 1.5)),
+                        const SizedBox(height: 10),
+                        Text('Dòng: ${gundam.series}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Cấp độ: ${gundam.grade}', style: const TextStyle(fontWeight: FontWeight.bold)),
+                        Text('Tỉ lệ: ${gundam.scale}', style: const TextStyle(fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),

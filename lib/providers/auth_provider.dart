@@ -1,11 +1,14 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:firebase_auth/firebase_auth.dart' as firebase_auth;
+import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/user.dart';
 
 class AuthProvider extends ChangeNotifier {
   User? _currentUser;
   bool _isLoading = false;
+
+  final firebase_auth.FirebaseAuth _auth = firebase_auth.FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   User? get currentUser => _currentUser;
   bool get isLoggedIn => _currentUser != null;
@@ -13,63 +16,84 @@ class AuthProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   Future<bool> tryAutoLogin() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (!prefs.containsKey('userData')) return false;
+    final firebaseUser = _auth.currentUser;
+    if (firebaseUser == null) {
+      return false;
+    }
 
-    final extractedData = json.decode(prefs.getString('userData')!) as Map<String, dynamic>;
-    _currentUser = User(
-      id: extractedData['id'],
-      email: extractedData['email'],
-      password: extractedData['password'] ?? '',
-      role: extractedData['role'] ?? 'customer',
-      name: extractedData['name'] ?? '',
-    );
-    notifyListeners();
-    return true;
+    try {
+      final doc = await _firestore.collection('users').doc(firebaseUser.uid).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        _currentUser = User(
+          id: firebaseUser.uid,
+          email: firebaseUser.email ?? '',
+          password: '', // Không cần lưu password ở local state
+          role: data['role'] ?? 'customer',
+          name: data['name'] ?? 'Khách',
+        );
+        notifyListeners();
+        return true;
+      }
+    } catch (e) {
+      print("Lỗi tự động đăng nhập: $e");
+    }
+    return false;
   }
 
   Future<String?> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network request
-
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersString = prefs.getString('usersData') ?? '{}';
-      final Map<String, dynamic> users = json.decode(usersString);
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
 
-      if (users.containsKey(email)) {
-        final userData = users[email];
-        if (userData['password'] == password) {
+      final firebaseUser = userCredential.user;
+      if (firebaseUser != null) {
+        final doc = await _firestore.collection('users').doc(firebaseUser.uid).get();
+        if (doc.exists) {
+          final data = doc.data()!;
           _currentUser = User(
-            id: userData['id'],
-            email: userData['email'],
-            password: userData['password'],
-            role: userData['role'] ?? 'customer',
-            name: userData['name'] ?? '',
+            id: firebaseUser.uid,
+            email: firebaseUser.email ?? '',
+            password: '', 
+            role: data['role'] ?? 'customer',
+            name: data['name'] ?? 'Khách',
           );
-          
-          final userDataString = json.encode({
-            'id': _currentUser!.id,
-            'email': _currentUser!.email,
-            'role': _currentUser!.role,
-            'name': _currentUser!.name,
-          });
-          await prefs.setString('userData', userDataString);
-          
-          _isLoading = false;
-          notifyListeners();
-          return null;
         } else {
-          _isLoading = false;
-          notifyListeners();
-          return 'Mật khẩu không chính xác.';
+          _currentUser = User(
+            id: firebaseUser.uid,
+            email: firebaseUser.email ?? '',
+            password: '', 
+            role: 'customer',
+            name: 'Khách',
+          );
         }
+        
+        _isLoading = false;
+        notifyListeners();
+        return null; // Trả về null nghĩa là không có lỗi -> Thành công
       }
+      
       _isLoading = false;
       notifyListeners();
-      return 'Không tìm thấy tài khoản với email này.';
+      return 'Đăng nhập thất bại, không nhận được thông tin từ Firebase.';
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      switch (e.code) {
+        case 'user-not-found':
+        case 'invalid-email':
+          return 'Không tìm thấy tài khoản với email này.';
+        case 'wrong-password':
+        case 'invalid-credential':
+          return 'Mật khẩu hoặc tài khoản không chính xác.';
+        default:
+          return 'Lỗi đăng nhập: ${e.message}';
+      }
     } catch (e) {
       _isLoading = false;
       notifyListeners();
@@ -81,49 +105,51 @@ class AuthProvider extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
 
-    await Future.delayed(const Duration(seconds: 1)); // Simulate network request
-
     try {
-      final prefs = await SharedPreferences.getInstance();
-      final usersString = prefs.getString('usersData') ?? '{}';
-      final Map<String, dynamic> users = json.decode(usersString);
-
-      if (users.containsKey(email)) {
-        _isLoading = false;
-        notifyListeners();
-        return 'Email này đã được sử dụng.';
-      }
-
-      final newUser = {
-        'id': DateTime.now().millisecondsSinceEpoch.toString(),
-        'email': email,
-        'password': password,
-        'name': name,
-        'role': 'customer',
-      };
-
-      users[email] = newUser;
-      await prefs.setString('usersData', json.encode(users));
-
-      _currentUser = User(
-        id: newUser['id']!,
-        email: newUser['email']!,
-        password: newUser['password']!,
-        role: newUser['role']!,
-        name: newUser['name']!,
+      final userCredential = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
       );
 
-      final userDataString = json.encode({
-        'id': _currentUser!.id,
-        'email': _currentUser!.email,
-        'role': _currentUser!.role,
-        'name': _currentUser!.name,
-      });
-      await prefs.setString('userData', userDataString);
+      final firebaseUser = userCredential.user;
+      if (firebaseUser != null) {
+        // Lưu thông tin người dùng vào Firestore
+        await _firestore.collection('users').doc(firebaseUser.uid).set({
+          'name': name,
+          'email': email,
+          'role': 'customer',
+          'createdAt': FieldValue.serverTimestamp(),
+        });
 
+        _currentUser = User(
+          id: firebaseUser.uid,
+          email: firebaseUser.email ?? '',
+          password: '',
+          role: 'customer',
+          name: name,
+        );
+        
+        _isLoading = false;
+        notifyListeners();
+        return null; // Trả về null nghĩa là thành công
+      }
+      
       _isLoading = false;
       notifyListeners();
-      return null;
+      return 'Không thể tạo tài khoản trên Firebase.';
+    } on firebase_auth.FirebaseAuthException catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      switch (e.code) {
+        case 'email-already-in-use':
+          return 'Email này đã được sử dụng.';
+        case 'weak-password':
+          return 'Mật khẩu quá yếu.';
+        case 'invalid-email':
+          return 'Email không hợp lệ.';
+        default:
+          return 'Lỗi đăng ký: ${e.message}';
+      }
     } catch (e) {
       _isLoading = false;
       notifyListeners();
@@ -132,8 +158,7 @@ class AuthProvider extends ChangeNotifier {
   }
 
   Future<void> logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('userData');
+    await _auth.signOut();
     _currentUser = null;
     notifyListeners();
   }

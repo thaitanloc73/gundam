@@ -39,7 +39,7 @@ class FavoriteProvider extends ChangeNotifier {
         }
       }
     } catch (e) {
-      print("Lỗi tải mục yêu thích: $e");
+      debugPrint("Lỗi tải mục yêu thích: $e");
     }
     notifyListeners();
   }
@@ -53,7 +53,7 @@ class FavoriteProvider extends ChangeNotifier {
         'favorites': _favoriteIds.toList(),
       }, SetOptions(merge: true));
     } catch (e) {
-      print("Lỗi đồng bộ mục yêu thích: $e");
+      debugPrint("Lỗi đồng bộ mục yêu thích: $e");
     }
   }
 

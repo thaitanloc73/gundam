@@ -68,7 +68,7 @@ class CartProvider extends ChangeNotifier {
       }
       notifyListeners(); // Báo cho giao diện cập nhật
     } catch (e) {
-      print("Lỗi tải giỏ hàng: $e");
+      debugPrint("Lỗi tải giỏ hàng: $e");
       _items = {};
       notifyListeners();
     }
@@ -86,7 +86,7 @@ class CartProvider extends ChangeNotifier {
         'cart': cartMap
       }, SetOptions(merge: true));
     } catch (e) {
-      print("Lỗi đồng bộ giỏ hàng: $e");
+      debugPrint("Lỗi đồng bộ giỏ hàng: $e");
     }
   }
 

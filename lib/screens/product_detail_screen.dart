@@ -392,8 +392,10 @@ class ProductDetailScreen extends StatelessWidget {
             flex: 2,
             child: InkWell(
               onTap: () {
-                _addToCart(context, gundam);
-                Navigator.pushNamed(context, AppRoutes.cart);
+                final success = _addToCart(context, gundam);
+                if (success) {
+                  Navigator.pushNamed(context, AppRoutes.cart);
+                }
               },
               child: Container(
                 color: AppColors.gundamRed,
@@ -411,11 +413,11 @@ class ProductDetailScreen extends StatelessWidget {
     );
   }
 
-  void _addToCart(BuildContext context, Gundam gundam) {
+  bool _addToCart(BuildContext context, Gundam gundam) {
     final auth = Provider.of<AuthProvider>(context, listen: false);
     if (!auth.isLoggedIn) {
       Navigator.pushNamed(context, AppRoutes.login);
-      return;
+      return false;
     }
     if (gundam.id != null) {
       Provider.of<CartProvider>(context, listen: false).addItem(gundam.id!, gundam.name, gundam.price, gundam.imageUrl);
@@ -423,5 +425,6 @@ class ProductDetailScreen extends StatelessWidget {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Đã thêm vào giỏ hàng!'), duration: Duration(seconds: 1)),
     );
+    return true;
   }
 }

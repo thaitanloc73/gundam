@@ -117,13 +117,15 @@ class ProfileScreen extends StatelessWidget {
                 color: surfaceColor,
                 child: Column(
                   children: [
-                    ListTile(
-                      leading: const Icon(Icons.favorite_border, color: AppColors.gundamRed),
-                      title: const Text('Sản phẩm yêu thích'),
-                      trailing: const Icon(Icons.chevron_right),
-                      onTap: () => Navigator.pushNamed(context, AppRoutes.favorites),
-                    ),
-                    const Divider(height: 1, indent: 50),
+                    if (authProvider.isLoggedIn) ...[
+                      ListTile(
+                        leading: const Icon(Icons.favorite_border, color: AppColors.gundamRed),
+                        title: const Text('Sản phẩm yêu thích'),
+                        trailing: const Icon(Icons.chevron_right),
+                        onTap: () => Navigator.pushNamed(context, AppRoutes.favorites),
+                      ),
+                      const Divider(height: 1, indent: 50),
+                    ],
 
                     Consumer<ThemeProvider>(
                       builder: (context, theme, _) => ListTile(

@@ -15,13 +15,16 @@ class AuthProvider extends ChangeNotifier {
   bool get isAdmin => _currentUser?.role == 'admin';
   bool get isLoading => _isLoading;
 
+  // Hàm tự động đăng nhập khi mở app (kiểm tra xem phiên đăng nhập trước đó còn hạn không)
   Future<bool> tryAutoLogin() async {
+    // Lấy thông tin user hiện tại từ bộ nhớ tạm của Firebase
     final firebaseUser = _auth.currentUser;
     if (firebaseUser == null) {
-      return false;
+      return false; // Chưa từng đăng nhập hoặc đã đăng xuất
     }
 
     try {
+      // Tải thêm thông tin cá nhân (tên, role, số điện thoại...) từ bảng 'users'
       final doc = await _firestore.collection('users').doc(firebaseUser.uid).get();
       if (doc.exists) {
         final data = doc.data()!;
@@ -36,51 +39,50 @@ class AuthProvider extends ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print("Lỗi tự động đăng nhập: $e");
+      debugPrint("Lỗi tự động đăng nhập: $e");
     }
     return false;
   }
 
+  // Hàm đăng nhập bằng Email và Mật khẩu
   Future<String?> login(String email, String password) async {
     _isLoading = true;
     notifyListeners();
 
     try {
+      // Gửi yêu cầu đăng nhập lên Firebase Auth
       final userCredential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       final firebaseUser = userCredential.user;
-      if (firebaseUser != null) {
-        final doc = await _firestore.collection('users').doc(firebaseUser.uid).get();
-        if (doc.exists) {
-          final data = doc.data()!;
-          _currentUser = User(
-            id: firebaseUser.uid,
-            email: firebaseUser.email ?? '',
-            password: '', 
-            role: data['role'] ?? 'customer',
-            name: data['name'] ?? 'Khách',
-          );
-        } else {
-          _currentUser = User(
-            id: firebaseUser.uid,
-            email: firebaseUser.email ?? '',
-            password: '', 
-            role: 'customer',
-            name: 'Khách',
-          );
-        }
-        
-        _isLoading = false;
-        notifyListeners();
-        return null; // Trả về null nghĩa là không có lỗi -> Thành công
+      if (firebaseUser == null) throw Exception("Không lấy được thông tin User");
+
+      // Tải thông tin chi tiết từ Database
+      final doc = await _firestore.collection('users').doc(firebaseUser.uid).get();
+      if (doc.exists) {
+        final data = doc.data()!;
+        _currentUser = User(
+          id: firebaseUser.uid,
+          email: firebaseUser.email ?? '',
+          password: '', 
+          role: data['role'] ?? 'customer',
+          name: data['name'] ?? 'Khách',
+        );
+      } else {
+        _currentUser = User(
+          id: firebaseUser.uid,
+          email: firebaseUser.email ?? '',
+          password: '', 
+          role: 'customer',
+          name: 'Khách',
+        );
       }
       
       _isLoading = false;
       notifyListeners();
-      return 'Đăng nhập thất bại, không nhận được thông tin từ Firebase.';
+      return null; // Trả về null nghĩa là không có lỗi -> Thành công
     } on firebase_auth.FirebaseAuthException catch (e) {
       _isLoading = false;
       notifyListeners();
@@ -101,42 +103,40 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
+  // Hàm đăng ký tài khoản mới
   Future<String?> register(String name, String email, String password) async {
     _isLoading = true;
     notifyListeners();
 
     try {
+      // 1. Tạo tài khoản định danh trên Firebase Auth
       final userCredential = await _auth.createUserWithEmailAndPassword(
         email: email,
         password: password,
       );
 
       final firebaseUser = userCredential.user;
-      if (firebaseUser != null) {
-        // Lưu thông tin người dùng vào Firestore
-        await _firestore.collection('users').doc(firebaseUser.uid).set({
-          'name': name,
-          'email': email,
-          'role': 'customer',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
+      if (firebaseUser == null) throw Exception("Không lấy được thông tin User");
 
-        _currentUser = User(
-          id: firebaseUser.uid,
-          email: firebaseUser.email ?? '',
-          password: '',
-          role: 'customer',
-          name: name,
-        );
-        
-        _isLoading = false;
-        notifyListeners();
-        return null; // Trả về null nghĩa là thành công
-      }
+      // 2. Lưu thông tin người dùng vào Firestore
+      await _firestore.collection('users').doc(firebaseUser.uid).set({
+        'name': name,
+        'email': email,
+        'role': 'customer',
+        'createdAt': FieldValue.serverTimestamp(),
+      });
+
+      _currentUser = User(
+        id: firebaseUser.uid,
+        email: firebaseUser.email ?? '',
+        password: '',
+        role: 'customer',
+        name: name,
+      );
       
       _isLoading = false;
       notifyListeners();
-      return 'Không thể tạo tài khoản trên Firebase.';
+      return null;
     } on firebase_auth.FirebaseAuthException catch (e) {
       _isLoading = false;
       notifyListeners();

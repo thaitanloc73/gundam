@@ -34,7 +34,7 @@ class OrderProvider extends ChangeNotifier {
       // Sắp xếp đơn hàng mới nhất lên đầu
       _orders.sort((a, b) => b.createdAt.compareTo(a.createdAt));
     } catch (e) {
-      print("Lỗi khi tải đơn hàng: $e");
+      debugPrint("Lỗi khi tải đơn hàng: $e");
       _orders = [];
     }
     _isLoading = false;
@@ -93,7 +93,7 @@ class OrderProvider extends ChangeNotifier {
 
       return null;
     } catch (e) {
-      print("Lỗi đặt hàng: $e");
+      debugPrint("Lỗi đặt hàng: $e");
       return 'Có lỗi xảy ra khi đặt hàng: $e';
     }
   }

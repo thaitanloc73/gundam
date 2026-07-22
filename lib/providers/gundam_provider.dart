@@ -23,7 +23,7 @@ class GundamProvider extends ChangeNotifier {
         return Gundam.fromMap(doc.data(), id: doc.id);
       }).toList();
     } catch (e) {
-      print("Lỗi khi tải dữ liệu từ Firebase: $e");
+      debugPrint("Lỗi khi tải dữ liệu từ Firebase: $e");
     }
     
     _isLoading = false;
